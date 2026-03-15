@@ -1,14 +1,14 @@
 # @phantasy/plugin-kalshi
 
 - Repo URL: https://github.com/phantasy-bot/plugin-kalshi
-- Extraction phase: `scaffold-only`
-- Source of truth: `standalone-repo`
-- Sync mode: `scaffold-package`
+- Extraction phase: `wrapper-package`
+- Source of truth: `monorepo-wrapper`
+- Sync mode: `dist-package`
 
 ## Meaning
 
-This repo is scaffolded as a direct standalone plugin package. It is the intended future source-of-truth, but it does not yet have a complete implementation.
+This repo currently mirrors an installable wrapper package surface generated from the main Phantasy monorepo. The package surface is real, but it has not been published to npm yet.
 
 ## Next Step
 
-Build the real plugin implementation directly in this repo and publish it independently once the functionality exists.
+Publish the wrapper package when it is ready, then continue toward true source extraction after the plugin's dependency seam is cleaned up.

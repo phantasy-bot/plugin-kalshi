@@ -15,11 +15,12 @@
   "permissions": [
     "internet"
   ],
+  "dependencies": [],
   "visibility": "public",
   "repoUrl": "https://github.com/phantasy-bot/plugin-kalshi",
-  "sourceOfTruth": "standalone-repo",
-  "syncMode": "scaffold-package",
-  "phase": "scaffold-only",
+  "sourceOfTruth": "monorepo-wrapper",
+  "syncMode": "dist-package",
+  "phase": "wrapper-package",
   "repoExists": true,
   "npmPublished": false,
   "phantasy": {
@@ -36,6 +37,7 @@
     "permissions": [
       "internet"
     ],
+    "pluginDependencies": [],
     "platforms": [
       "node"
     ],
@@ -63,5 +65,5 @@
       }
     }
   },
-  "exportedAt": "2026-03-15T16:20:07.263Z"
+  "exportedAt": "2026-03-15T17:58:06.220Z"
 }

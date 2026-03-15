@@ -1,52 +1,44 @@
 {
   "name": "@phantasy/plugin-kalshi",
   "version": "2.0.0",
-  "private": true,
-  "description": "Kalshi prediction-market integration plugin for Phantasy.",
+  "description": "Installable Kalshi prediction-market plugin surface for Phantasy",
   "license": "MIT",
-  "type": "module",
   "main": "./dist/index.js",
   "types": "./dist/index.d.ts",
   "exports": {
     ".": {
       "types": "./dist/index.d.ts",
-      "import": "./dist/index.js",
-      "require": "./dist/index.js"
+      "require": "./dist/index.js",
+      "import": "./dist/index.js"
     }
   },
   "files": [
     "dist",
     "README.md",
     "LICENSE",
-    "SECURITY.md",
-    "phantasy.plugin.json"
+    "SECURITY.md"
   ],
-  "sideEffects": false,
-  "keywords": [
-    "kalshi",
-    "prediction-markets",
-    "trading",
-    "finance"
-  ],
-  "repository": {
-    "type": "git",
-    "url": "https://github.com/phantasy-bot/plugin-kalshi"
-  },
   "publishConfig": {
     "access": "public"
   },
-  "homepage": "https://github.com/phantasy-bot/plugin-kalshi",
-  "scripts": {
-    "build": "tsup",
-    "typecheck": "tsc --noEmit"
+  "sideEffects": false,
+  "keywords": [
+    "ai",
+    "agent",
+    "plugin",
+    "kalshi",
+    "markets"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/phantasy-bot/agent.git"
   },
-  "peerDependencies": {
+  "bugs": {
+    "url": "https://github.com/phantasy-bot/agent/issues"
+  },
+  "homepage": "https://github.com/phantasy-bot/agent#readme",
+  "dependencies": {
     "@phantasy/agent": "^2.0.0"
-  },
-  "devDependencies": {
-    "@types/node": "^24.0.0",
-    "tsup": "^8.0.0",
-    "typescript": "^5.9.2"
   },
   "phantasy": {
     "displayName": "Kalshi",
@@ -72,10 +64,10 @@
       "section": "business",
       "workspace": "business",
       "kind": "generic",
+      "advancedModule": "prediction-markets",
       "keywords": [
         "kalshi",
-        "prediction-markets",
-        "trading",
+        "prediction markets",
         "finance"
       ]
     },
@@ -85,6 +77,13 @@
         "enabled": {
           "type": "boolean",
           "default": true
+        },
+        "apiKey": {
+          "type": "string"
+        },
+        "environment": {
+          "type": "string",
+          "default": "demo"
         }
       }
     }
