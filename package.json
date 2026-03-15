@@ -32,6 +32,9 @@
     "type": "git",
     "url": "https://github.com/phantasy-bot/plugin-kalshi"
   },
+  "publishConfig": {
+    "access": "public"
+  },
   "homepage": "https://github.com/phantasy-bot/plugin-kalshi",
   "scripts": {
     "build": "tsup",
