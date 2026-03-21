@@ -1,15 +1,93 @@
 {
   "name": "@phantasy/plugin-kalshi",
-  "version": "1.0.0",
-  "description": "kalshi plugin for Phantasy",
-  "main": "dist/index.js",
-  "types": "dist/index.d.ts",
+  "version": "2.0.1",
+  "private": false,
+  "description": "Kalshi prediction-market integration plugin for Phantasy.",
+  "license": "MIT",
   "type": "module",
-  "scripts": { "build": "tsc", "test": "vitest run", "prepublishOnly": "npm run build" },
-  "keywords": ["phantasy", "plugin", "kalshi"],
-  "author": "Phantasy",
-  "license": "BUSL-1.1",
-  "repository": { "type": "git", "url": "https://github.com/phantasy-bot/plugin-kalshi" },
-  "peerDependencies": { "@phantasy/core": "^1.0.0" },
-  "devDependencies": { "@types/node": "^20.10.0", "typescript": "^5.3.0", "vitest": "^1.0.0" }
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js",
+      "require": "./dist/index.js"
+    }
+  },
+  "files": [
+    "dist",
+    "README.md",
+    "LICENSE",
+    "SECURITY.md",
+    "phantasy.plugin.json"
+  ],
+  "sideEffects": false,
+  "keywords": [
+    "kalshi",
+    "prediction-markets",
+    "trading",
+    "finance"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/phantasy-bot/plugin-kalshi"
+  },
+  "publishConfig": {
+    "access": "public"
+  },
+  "homepage": "https://github.com/phantasy-bot/plugin-kalshi",
+  "scripts": {
+    "build": "tsup",
+    "typecheck": "tsc --noEmit"
+  },
+  "peerDependencies": {
+    "@phantasy/agent": "^2.0.1"
+  },
+  "devDependencies": {
+    "@types/node": "^24.0.0",
+    "tsup": "^8.0.0",
+    "typescript": "^5.9.2"
+  },
+  "phantasy": {
+    "displayName": "Kalshi",
+    "category": "markets",
+    "tags": [
+      "kalshi",
+      "prediction-markets",
+      "trading",
+      "finance"
+    ],
+    "workspace": "business",
+    "extensionKind": "integration",
+    "permissions": [
+      "internet"
+    ],
+    "pluginDependencies": [],
+    "platforms": [
+      "node"
+    ],
+    "productionReady": false,
+    "adminSurface": {
+      "tabId": "kalshi",
+      "label": "Kalshi",
+      "section": "business",
+      "workspace": "business",
+      "kind": "generic",
+      "keywords": [
+        "kalshi",
+        "prediction-markets",
+        "trading",
+        "finance"
+      ]
+    },
+    "configSchema": {
+      "type": "object",
+      "properties": {
+        "enabled": {
+          "type": "boolean",
+          "default": true
+        }
+      }
+    }
+  }
 }

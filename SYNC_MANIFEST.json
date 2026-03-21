@@ -1,0 +1,95 @@
+{
+  "slug": "plugin-kalshi",
+  "packageName": "@phantasy/plugin-kalshi",
+  "displayName": "Kalshi",
+  "description": "Kalshi prediction-market integration plugin for Phantasy.",
+  "workspace": "business",
+  "extensionKind": "integration",
+  "category": "markets",
+  "tags": [
+    "kalshi",
+    "prediction-markets",
+    "trading",
+    "finance"
+  ],
+  "permissions": [
+    "internet"
+  ],
+  "dependencies": [],
+  "visibility": "public",
+  "repoUrl": "https://github.com/phantasy-bot/plugin-kalshi",
+  "sourceOfTruth": "standalone-repo",
+  "syncMode": "source-extract",
+  "phase": "source-extracted",
+  "repoExists": true,
+  "npmPublished": false,
+  "sourceExtract": {
+    "files": [
+      {
+        "sourcePath": "src/plugins/kalshi/index.ts",
+        "targetPath": "src/index.ts"
+      },
+      {
+        "sourcePath": "src/plugins/kalshi/kalshi-plugin.ts",
+        "targetPath": "src/kalshi-plugin.ts"
+      },
+      {
+        "sourcePath": "src/plugins/kalshi/kalshi-service.ts",
+        "targetPath": "src/kalshi-service.ts"
+      }
+    ],
+    "replacements": [
+      {
+        "from": "import { BasePlugin, type PluginTool } from \"@/plugins/base-plugin\";",
+        "to": "import { BasePlugin, type PluginTool } from \"@phantasy/agent/plugins\";"
+      },
+      {
+        "from": "\"@/plugin-runtime\"",
+        "to": "\"@phantasy/agent/plugin-runtime\""
+      }
+    ]
+  },
+  "phantasy": {
+    "displayName": "Kalshi",
+    "category": "markets",
+    "tags": [
+      "kalshi",
+      "prediction-markets",
+      "trading",
+      "finance"
+    ],
+    "workspace": "business",
+    "extensionKind": "integration",
+    "permissions": [
+      "internet"
+    ],
+    "pluginDependencies": [],
+    "platforms": [
+      "node"
+    ],
+    "productionReady": false,
+    "adminSurface": {
+      "tabId": "kalshi",
+      "label": "Kalshi",
+      "section": "business",
+      "workspace": "business",
+      "kind": "generic",
+      "keywords": [
+        "kalshi",
+        "prediction-markets",
+        "trading",
+        "finance"
+      ]
+    },
+    "configSchema": {
+      "type": "object",
+      "properties": {
+        "enabled": {
+          "type": "boolean",
+          "default": true
+        }
+      }
+    }
+  },
+  "exportedAt": "2026-03-21T22:09:30.399Z"
+}
