@@ -1,0 +1,21 @@
+{
+  "name": "@phantasy/plugin-kalshi",
+  "version": "2.0.0",
+  "description": "Kalshi prediction-market integration plugin for Phantasy.",
+  "displayName": "Kalshi",
+  "workspace": "business",
+  "extensionKind": "integration",
+  "adminSurface": {
+    "tabId": "kalshi",
+    "label": "Kalshi",
+    "section": "business",
+    "workspace": "business",
+    "kind": "generic",
+    "keywords": [
+      "kalshi",
+      "prediction-markets",
+      "trading",
+      "finance"
+    ]
+  }
+}
