@@ -1,23 +1,50 @@
-# Kalshi
+# @phantasy/plugin-kalshi
 
-Kalshi prediction-market integration plugin for Phantasy.
+Kalshi prediction-market integration for Phantasy.
 
-Package: `@phantasy/plugin-kalshi`
-Repo: https://github.com/phantasy-bot/plugin-kalshi
+## Features
 
-## Status
+- Exchange status
+- Market search / detail / order book / trades
+- Portfolio balance and positions
+- Order list, gated create (V2 book-side API), and cancel
+- Demo or production environment
 
-This repository is the standalone source for the Kalshi plugin. It ships an installable Phantasy plugin package instead of keeping this optional capability in the core Phantasy runtime.
-
-## Development
+## Install
 
 ```bash
-npm install
-npm run typecheck
-npm run build
-npm pack --dry-run
+phantasy extensions install plugin kalshi
+# or
+npm install @phantasy/plugin-kalshi
 ```
 
-## Runtime Contract
+## Configuration
 
-The plugin uses the public `@phantasy/agent/plugins` and `@phantasy/agent/plugin-runtime` surfaces. Do not import private paths from the Phantasy monorepo.
+| Key | Env | Description |
+| --- | --- | --- |
+| `apiKey` | `KALSHI_API_KEY` | API key id from Kalshi developer console |
+| `privateKeyPem` | `KALSHI_PRIVATE_KEY_PEM` | Unencrypted RSA private key PEM |
+| `environment` | `KALSHI_ENVIRONMENT` | `demo` (default) or `production` |
+| `allowTrading` | `KALSHI_ALLOW_TRADING` | Must be `true` to place/cancel orders |
+
+## Agent tools
+
+- `kalshi_status`
+- `kalshi_search_markets`
+- `kalshi_get_market`
+- `kalshi_get_balance`
+- `kalshi_get_positions`
+- `kalshi_get_orders`
+- `kalshi_create_order` (requires `allowTrading`)
+- `kalshi_cancel_order` (requires `allowTrading`)
+- `kalshi_get_orderbook`
+
+Orders accept legacy `side` (`yes`/`no`) + `action` (`buy`/`sell`) + price in **cents** (1–99). The service maps these to Kalshi Trade API V2 YES-book `bid`/`ask` + dollar fixed-point prices.
+
+## Safety
+
+Trading is off by default. Use demo credentials first. Never commit private keys.
+
+## Presets
+
+See Phantasy presets: `prediction-markets`, `kalshi-trader`.

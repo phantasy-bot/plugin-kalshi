@@ -1,6 +1,6 @@
 {
   "name": "@phantasy/plugin-kalshi",
-  "version": "0.1.0-beta",
+  "version": "0.2.0-beta",
   "description": "Kalshi prediction-market integration plugin for Phantasy.",
   "displayName": "Kalshi",
   "author": "Phantasy",
@@ -11,52 +11,32 @@
   "workspace": "business",
   "extensionKind": "integration",
   "category": "markets",
-  "tags": [
-    "kalshi",
-    "prediction-markets",
-    "trading",
-    "finance"
-  ],
-  "keywords": [
-    "kalshi",
-    "prediction-markets",
-    "trading",
-    "finance"
-  ],
-  "permissions": [
-    "internet"
-  ],
+  "tags": ["kalshi", "prediction-markets", "trading", "finance"],
+  "keywords": ["kalshi", "prediction-markets", "trading", "finance"],
+  "permissions": ["internet"],
   "dependencies": [],
-  "platforms": [
-    "node"
-  ],
-  "productionReady": false,
+  "platforms": ["node"],
+  "productionReady": true,
   "adminSurface": {
     "tabId": "kalshi",
     "label": "Kalshi",
     "workspace": "business",
     "kind": "generic",
     "advancedModule": "prediction-markets",
-    "keywords": [
-      "kalshi",
-      "prediction markets",
-      "finance"
-    ]
+    "keywords": ["kalshi", "prediction markets", "finance"]
   },
   "configSchema": {
     "type": "object",
     "properties": {
-      "enabled": {
-        "type": "boolean",
-        "default": true
-      },
-      "apiKey": {
-        "type": "string"
-      },
+      "enabled": { "type": "boolean", "default": true },
+      "apiKey": { "type": "string" },
+      "privateKeyPem": { "type": "string" },
       "environment": {
         "type": "string",
+        "enum": ["demo", "production"],
         "default": "demo"
-      }
+      },
+      "allowTrading": { "type": "boolean", "default": false }
     }
   },
   "data": {
@@ -66,12 +46,6 @@
         "kind": "config",
         "description": "Kalshi API environment and operator configuration.",
         "erasable": false
-      },
-      {
-        "name": "revenue_events",
-        "kind": "postgres",
-        "description": "Financial events linked to prediction-market activity when synced.",
-        "erasable": false
       }
     ],
     "dataCategories": [
@@ -80,46 +54,12 @@
       "positions",
       "financial activity"
     ],
-    "externalServices": [
-      "Kalshi API"
-    ],
+    "externalServices": ["Kalshi API"],
     "retentionDefault": "persist",
     "erasable": false
   },
   "phantasy": {
-    "extensions": [
-      {
-        "path": "./dist/index.js",
-        "kind": "tool"
-      }
-    ],
-    "pluginDependencies": [],
-    "data": {
-      "stores": [
-        {
-          "name": "agent_configs.kalshiConfig",
-          "kind": "config",
-          "description": "Kalshi API environment and operator configuration.",
-          "erasable": false
-        },
-        {
-          "name": "revenue_events",
-          "kind": "postgres",
-          "description": "Financial events linked to prediction-market activity when synced.",
-          "erasable": false
-        }
-      ],
-      "dataCategories": [
-        "prediction market account metadata",
-        "market orders",
-        "positions",
-        "financial activity"
-      ],
-      "externalServices": [
-        "Kalshi API"
-      ],
-      "retentionDefault": "persist",
-      "erasable": false
-    }
+    "extensions": [{ "path": "./dist/index.js", "kind": "tool" }],
+    "pluginDependencies": []
   }
 }
