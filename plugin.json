@@ -1,0 +1,122 @@
+{
+  "$schema": "https://agent-plugins.org/schemas/1.0.0/plugin.schema.json",
+  "name": "plugin-kalshi",
+  "version": "0.2.2-beta",
+  "description": "Kalshi prediction-market integration plugin for Phantasy.",
+  "author": {
+    "name": "Phantasy"
+  },
+  "homepage": "https://github.com/phantasy-bot/plugin-kalshi",
+  "repository": "https://github.com/phantasy-bot/plugin-kalshi",
+  "license": "MIT",
+  "keywords": [
+    "kalshi",
+    "prediction-markets",
+    "trading",
+    "finance"
+  ],
+  "extensions": {
+    "bot.phantasy": {
+      "packageName": "@phantasy/plugin-kalshi",
+      "runtimeName": "kalshi",
+      "displayName": "Kalshi",
+      "main": "./dist/index.js",
+      "workspace": "business",
+      "extensionKind": "integration",
+      "category": "markets",
+      "tags": [
+        "kalshi",
+        "prediction-markets",
+        "trading",
+        "finance"
+      ],
+      "permissions": [
+        "internet"
+      ],
+      "platforms": [
+        "node"
+      ],
+      "productionReady": true,
+      "adminSurface": {
+        "tabId": "kalshi",
+        "label": "Kalshi",
+        "workspace": "business",
+        "kind": "generic",
+        "advancedModule": "prediction-markets",
+        "keywords": [
+          "kalshi",
+          "prediction markets",
+          "finance"
+        ]
+      },
+      "configSchema": {
+        "type": "object",
+        "properties": {
+          "enabled": {
+            "type": "boolean",
+            "default": true,
+            "title": "Enabled",
+            "description": "Load Kalshi tools and admin surface."
+          },
+          "allowTrading": {
+            "type": "boolean",
+            "default": false,
+            "title": "Allow trading",
+            "description": "When on, order tools may place and cancel live orders. Toggle anytime in this plugin form — no restart required."
+          },
+          "environment": {
+            "type": "string",
+            "enum": [
+              "demo",
+              "production"
+            ],
+            "default": "demo",
+            "title": "Environment",
+            "description": "Use demo for practice; production places real orders when trading is allowed."
+          },
+          "apiKey": {
+            "type": "string",
+            "title": "API key ID",
+            "format": "password"
+          },
+          "privateKeyPem": {
+            "type": "string",
+            "title": "RSA private key (PEM)",
+            "format": "pem"
+          }
+        }
+      },
+      "data": {
+        "stores": [
+          {
+            "name": "agent_configs.kalshiConfig",
+            "kind": "config",
+            "description": "Kalshi API environment and operator configuration.",
+            "erasable": false
+          }
+        ],
+        "dataCategories": [
+          "prediction market account metadata",
+          "market orders",
+          "positions",
+          "financial activity"
+        ],
+        "externalServices": [
+          "Kalshi API"
+        ],
+        "retentionDefault": "persist",
+        "erasable": false
+      },
+      "phantasy": {
+        "extensions": [
+          {
+            "path": "./dist/index.js",
+            "kind": "tool"
+          }
+        ],
+        "pluginDependencies": [],
+        "productionReady": true
+      }
+    }
+  }
+}
