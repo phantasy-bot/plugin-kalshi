@@ -42,11 +42,31 @@ var import_plugins = require("@phantasy/agent/plugins");
 var import_plugin_runtime = require("@phantasy/agent/plugin-runtime");
 
 // src/config-resolve.ts
-function resolveAllowTrading(configValue, envValue) {
-  if (typeof configValue === "boolean") return configValue;
-  if (configValue === "true" || configValue === "1") return true;
-  if (configValue === "false" || configValue === "0") return false;
+function resolveAllowTrading(config, key, envValue) {
+  if (Object.prototype.hasOwnProperty.call(config, key)) {
+    const value = config[key];
+    if (typeof value === "boolean") return value;
+    if (value === "true" || value === "1") return true;
+    if (value === "false" || value === "0") return false;
+    return false;
+  }
   return envValue === "true" || envValue === "1";
+}
+function parseYesNoSide(value) {
+  const normalized = String(value ?? "").trim().toLowerCase();
+  if (normalized === "yes" || normalized === "no") {
+    return normalized;
+  }
+  throw new Error(`side must be "yes" or "no" (got ${JSON.stringify(value)})`);
+}
+function parseBuySellAction(value) {
+  const normalized = String(value ?? "").trim().toLowerCase();
+  if (normalized === "buy" || normalized === "sell") {
+    return normalized;
+  }
+  throw new Error(
+    `action must be "buy" or "sell" (got ${JSON.stringify(value)})`
+  );
 }
 
 // src/kalshi-service.ts
@@ -299,8 +319,16 @@ ${footer}
       );
     }
   }
+  assertTradingEnabled(action) {
+    if (!this.config.allowTrading) {
+      throw new Error(
+        `Trading disabled (${action}). Turn on \u201CAllow trading\u201D in Admin \u2192 Plugins \u2192 Kalshi, then Save.`
+      );
+    }
+  }
   async createOrder(params) {
     this.ensureInitialized();
+    this.assertTradingEnabled("createOrder");
     try {
       const mapped = mapLegacyOrderToV2(params);
       const body = {
@@ -336,6 +364,7 @@ ${footer}
   }
   async cancelOrder(orderId) {
     this.ensureInitialized();
+    this.assertTradingEnabled("cancelOrder");
     try {
       const response = await this.ordersApi.cancelOrderV2(orderId);
       log.info("Order canceled", { orderId });
@@ -399,7 +428,7 @@ function num(value) {
 }
 var KalshiPlugin = class extends import_plugins.BasePlugin {
   name = "kalshi";
-  version = "0.2.1-beta";
+  version = "0.2.2-beta";
   description = "Kalshi prediction markets: search, prices, portfolio, and gated order placement.";
   displayName = "Kalshi";
   category = "markets";
@@ -481,7 +510,8 @@ var KalshiPlugin = class extends import_plugins.BasePlugin {
       privateKeyPem: str(cfg.privateKeyPem) || process.env.KALSHI_PRIVATE_KEY_PEM || process.env.KALSHI_PRIVATE_KEY,
       environment,
       allowTrading: resolveAllowTrading(
-        cfg.allowTrading,
+        cfg,
+        "allowTrading",
         process.env.KALSHI_ALLOW_TRADING
       )
     };
@@ -497,7 +527,8 @@ var KalshiPlugin = class extends import_plugins.BasePlugin {
     const service = new KalshiService({
       apiKey: creds.apiKey,
       privateKeyPem: creds.privateKeyPem,
-      environment: creds.environment
+      environment: creds.environment,
+      allowTrading: creds.allowTrading
     });
     await service.initialize();
     this.service = service;
@@ -689,8 +720,8 @@ var KalshiPlugin = class extends import_plugins.BasePlugin {
           }
           const order = {
             ticker: str(params.ticker) || "",
-            side: str(params.side) === "no" ? "no" : "yes",
-            action: str(params.action) === "sell" ? "sell" : "buy",
+            side: parseYesNoSide(params.side),
+            action: parseBuySellAction(params.action),
             count: num(params.count) || 0,
             price: num(params.price) || 0,
             type: str(params.type) === "market" ? "market" : "limit"

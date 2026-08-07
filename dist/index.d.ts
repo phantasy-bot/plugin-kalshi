@@ -70,6 +70,8 @@ interface KalshiServiceConfig {
     apiKey: string;
     privateKeyPem: string;
     environment?: "production" | "demo";
+    /** Defense-in-depth gate for order mutations (also enforced in plugin tools). */
+    allowTrading?: boolean;
 }
 interface ExchangeStatus {
     exchange_active: boolean;
@@ -198,6 +200,7 @@ declare class KalshiService {
         ticker?: string;
         status?: "resting" | "canceled" | "executed" | string;
     }): Promise<Order[]>;
+    private assertTradingEnabled;
     createOrder(params: CreateOrderParams): Promise<CreateOrderResult>;
     cancelOrder(orderId: string): Promise<{
         success: boolean;

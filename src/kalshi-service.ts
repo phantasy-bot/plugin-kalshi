@@ -20,6 +20,8 @@ export interface KalshiServiceConfig {
   apiKey: string;
   privateKeyPem: string;
   environment?: "production" | "demo";
+  /** Defense-in-depth gate for order mutations (also enforced in plugin tools). */
+  allowTrading?: boolean;
 }
 
 export interface ExchangeStatus {
@@ -456,8 +458,17 @@ export class KalshiService {
     }
   }
 
+  private assertTradingEnabled(action: string): void {
+    if (!this.config.allowTrading) {
+      throw new Error(
+        `Trading disabled (${action}). Turn on “Allow trading” in Admin → Plugins → Kalshi, then Save.`,
+      );
+    }
+  }
+
   async createOrder(params: CreateOrderParams): Promise<CreateOrderResult> {
     this.ensureInitialized();
+    this.assertTradingEnabled("createOrder");
     try {
       const mapped = mapLegacyOrderToV2(params);
       const body: CreateOrderV2Request = {
@@ -502,6 +513,7 @@ export class KalshiService {
     reduced_by?: string;
   }> {
     this.ensureInitialized();
+    this.assertTradingEnabled("cancelOrder");
     try {
       const response = await this.ordersApi.cancelOrderV2(orderId);
       log.info("Order canceled", { orderId });

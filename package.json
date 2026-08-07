@@ -1,6 +1,6 @@
 {
   "name": "@phantasy/plugin-kalshi",
-  "version": "0.2.1-beta",
+  "version": "0.2.2-beta",
   "private": false,
   "description": "Kalshi prediction-market integration plugin for Phantasy.",
   "license": "MIT",

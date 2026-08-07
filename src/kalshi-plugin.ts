@@ -5,10 +5,18 @@ import {
 } from "@phantasy/agent/plugins";
 import { createPluginModuleLogger } from "@phantasy/agent/plugin-runtime";
 
-import { resolveAllowTrading } from "./config-resolve.js";
+import {
+  parseBuySellAction,
+  parseYesNoSide,
+  resolveAllowTrading,
+} from "./config-resolve.js";
 import { KalshiService, type CreateOrderParams } from "./kalshi-service.js";
 
-export { resolveAllowTrading } from "./config-resolve.js";
+export {
+  parseBuySellAction,
+  parseYesNoSide,
+  resolveAllowTrading,
+} from "./config-resolve.js";
 
 const log = createPluginModuleLogger("KalshiPlugin");
 
@@ -27,7 +35,7 @@ function num(value: unknown): number | undefined {
 
 export class KalshiPlugin extends BasePlugin {
   name = "kalshi";
-  version = "0.2.1-beta";
+  version = "0.2.2-beta";
   description =
     "Kalshi prediction markets: search, prices, portfolio, and gated order placement.";
 
@@ -128,7 +136,8 @@ export class KalshiPlugin extends BasePlugin {
         process.env.KALSHI_PRIVATE_KEY,
       environment,
       allowTrading: resolveAllowTrading(
-        cfg.allowTrading,
+        cfg,
+        "allowTrading",
         process.env.KALSHI_ALLOW_TRADING,
       ),
     };
@@ -146,6 +155,7 @@ export class KalshiPlugin extends BasePlugin {
       apiKey: creds.apiKey,
       privateKeyPem: creds.privateKeyPem,
       environment: creds.environment,
+      allowTrading: creds.allowTrading,
     });
     await service.initialize();
     this.service = service;
@@ -351,8 +361,8 @@ export class KalshiPlugin extends BasePlugin {
           }
           const order: CreateOrderParams = {
             ticker: str(params.ticker) || "",
-            side: str(params.side) === "no" ? "no" : "yes",
-            action: str(params.action) === "sell" ? "sell" : "buy",
+            side: parseYesNoSide(params.side),
+            action: parseBuySellAction(params.action),
             count: num(params.count) || 0,
             price: num(params.price) || 0,
             type: str(params.type) === "market" ? "market" : "limit",

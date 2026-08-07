@@ -1,6 +1,6 @@
 {
   "name": "@phantasy/plugin-kalshi",
-  "version": "0.2.1-beta",
+  "version": "0.2.2-beta",
   "description": "Kalshi prediction-market integration plugin for Phantasy.",
   "displayName": "Kalshi",
   "author": "Phantasy",
@@ -108,6 +108,7 @@
         "kind": "tool"
       }
     ],
-    "pluginDependencies": []
+    "pluginDependencies": [],
+    "productionReady": true
   }
 }

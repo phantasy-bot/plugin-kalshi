@@ -1,6 +1,10 @@
 import { describe, expect, it } from "vitest";
 
-import { resolveAllowTrading } from "./config-resolve.js";
+import {
+  parseBuySellAction,
+  parseYesNoSide,
+  resolveAllowTrading,
+} from "./config-resolve.js";
 import { KalshiService, mapLegacyOrderToV2 } from "./kalshi-service.js";
 
 describe("KalshiService", () => {
@@ -96,10 +100,50 @@ describe("mapLegacyOrderToV2", () => {
 });
 
 describe("resolveAllowTrading", () => {
-  it("lets plugin UI config override env", () => {
-    expect(resolveAllowTrading(true, "false")).toBe(true);
-    expect(resolveAllowTrading(false, "true")).toBe(false);
-    expect(resolveAllowTrading(undefined, "true")).toBe(true);
-    expect(resolveAllowTrading(undefined, undefined)).toBe(false);
+  it("lets explicit plugin UI config override env", () => {
+    expect(resolveAllowTrading({ allowTrading: true }, "allowTrading", "false")).toBe(
+      true,
+    );
+    expect(resolveAllowTrading({ allowTrading: false }, "allowTrading", "true")).toBe(
+      false,
+    );
+    expect(resolveAllowTrading({}, "allowTrading", "true")).toBe(true);
+    expect(resolveAllowTrading({}, "allowTrading", undefined)).toBe(false);
+  });
+});
+
+describe("order side/action parsing", () => {
+  it("accepts case-insensitive yes/no and buy/sell", () => {
+    expect(parseYesNoSide("YES")).toBe("yes");
+    expect(parseYesNoSide("No")).toBe("no");
+    expect(parseBuySellAction("SELL")).toBe("sell");
+    expect(parseBuySellAction("Buy")).toBe("buy");
+  });
+
+  it("rejects invalid values instead of silently remapping", () => {
+    expect(() => parseYesNoSide("maybe")).toThrow(/side must be/);
+    expect(() => parseBuySellAction("hold")).toThrow(/action must be/);
+  });
+});
+
+describe("KalshiService trading gate", () => {
+  it("refuses createOrder when allowTrading is false", async () => {
+    const service = new KalshiService({
+      apiKey: "test-key",
+      privateKeyPem:
+        "-----BEGIN RSA PRIVATE KEY-----\nMIIB\n-----END RSA PRIVATE KEY-----\n",
+      allowTrading: false,
+    });
+    // Force initialized without network
+    (service as unknown as { initialized: boolean }).initialized = true;
+    await expect(
+      service.createOrder({
+        ticker: "TEST",
+        side: "yes",
+        action: "buy",
+        count: 1,
+        price: 50,
+      }),
+    ).rejects.toThrow(/Trading disabled/);
   });
 });
