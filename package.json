@@ -1,6 +1,6 @@
 {
   "name": "@phantasy/plugin-kalshi",
-  "version": "0.2.0-beta",
+  "version": "0.2.1-beta",
   "private": false,
   "description": "Kalshi prediction-market integration plugin for Phantasy.",
   "license": "MIT",
@@ -97,21 +97,35 @@
       "properties": {
         "enabled": {
           "type": "boolean",
-          "default": true
-        },
-        "apiKey": {
-          "type": "string"
-        },
-        "privateKeyPem": {
-          "type": "string"
-        },
-        "environment": {
-          "type": "string",
-          "default": "demo"
+          "default": true,
+          "title": "Enabled",
+          "description": "Load Kalshi tools and admin surface."
         },
         "allowTrading": {
           "type": "boolean",
-          "default": false
+          "default": false,
+          "title": "Allow trading",
+          "description": "When on, order tools may place and cancel live orders. Toggle anytime in this plugin form — no restart required."
+        },
+        "environment": {
+          "type": "string",
+          "enum": [
+            "demo",
+            "production"
+          ],
+          "default": "demo",
+          "title": "Environment",
+          "description": "Use demo for practice; production places real orders when trading is allowed."
+        },
+        "apiKey": {
+          "type": "string",
+          "title": "API key ID",
+          "format": "password"
+        },
+        "privateKeyPem": {
+          "type": "string",
+          "title": "RSA private key (PEM)",
+          "format": "pem"
         }
       }
     },

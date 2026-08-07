@@ -15,6 +15,7 @@ declare module "@phantasy/agent/plugins" {
     protected adminSurface?: unknown;
     protected configSchema?: unknown;
     onInit(agentConfig: unknown, config?: Record<string, unknown>): Promise<void>;
+    onConfigUpdated(newConfig: Record<string, unknown>): Promise<void>;
     getConfig(): Record<string, unknown>;
     getTools(): PluginTool[];
     handleCustomEndpoint?(request: Request, path: string): Promise<Response | null>;

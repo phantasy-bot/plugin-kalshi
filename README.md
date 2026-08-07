@@ -48,3 +48,11 @@ Trading is off by default. Use demo credentials first. Never commit private keys
 ## Presets
 
 See Phantasy presets: `prediction-markets`, `kalshi-trader`.
+
+## Allow trading (Admin UI)
+
+1. Open **Admin → Plugins** (or **Business → Kalshi/Polymarket** tab).
+2. Toggle **Allow trading** on or off.
+3. Click **Save**.
+
+Plugin form values override env defaults. No restart required.

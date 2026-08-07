@@ -41,6 +41,14 @@ module.exports = __toCommonJS(index_exports);
 var import_plugins = require("@phantasy/agent/plugins");
 var import_plugin_runtime = require("@phantasy/agent/plugin-runtime");
 
+// src/config-resolve.ts
+function resolveAllowTrading(configValue, envValue) {
+  if (typeof configValue === "boolean") return configValue;
+  if (configValue === "true" || configValue === "1") return true;
+  if (configValue === "false" || configValue === "0") return false;
+  return envValue === "true" || envValue === "1";
+}
+
 // src/kalshi-service.ts
 var import_kalshi_typescript = require("kalshi-typescript");
 var import_crypto = __toESM(require("crypto"), 1);
@@ -391,7 +399,7 @@ function num(value) {
 }
 var KalshiPlugin = class extends import_plugins.BasePlugin {
   name = "kalshi";
-  version = "0.2.0-beta";
+  version = "0.2.1-beta";
   description = "Kalshi prediction markets: search, prices, portfolio, and gated order placement.";
   displayName = "Kalshi";
   category = "markets";
@@ -424,32 +432,58 @@ var KalshiPlugin = class extends import_plugins.BasePlugin {
     workspace: "business",
     kind: "generic",
     advancedModule: "prediction-markets",
-    keywords: ["kalshi", "prediction markets", "finance"]
+    keywords: ["kalshi", "prediction markets", "finance", "allow trading"]
   };
   configSchema = {
     type: "object",
     properties: {
-      enabled: { type: "boolean", default: true },
-      apiKey: { type: "string" },
-      privateKeyPem: { type: "string" },
+      enabled: {
+        type: "boolean",
+        default: true,
+        title: "Enabled",
+        description: "Load Kalshi tools and admin surface."
+      },
+      allowTrading: {
+        type: "boolean",
+        default: false,
+        title: "Allow trading",
+        description: "When on, order tools may place and cancel live orders. Toggle anytime in this plugin form \u2014 no restart required. Leave off for research-only agents. Prefer demo environment until you intend real risk."
+      },
       environment: {
         type: "string",
         enum: ["demo", "production"],
-        default: "demo"
+        default: "demo",
+        title: "Environment",
+        description: "Use demo for practice; production places real orders when trading is allowed."
       },
-      allowTrading: { type: "boolean", default: false }
+      apiKey: {
+        type: "string",
+        title: "API key ID",
+        description: "Kalshi API key id from the developer console. Can also be set via env for bootstrap only.",
+        format: "password"
+      },
+      privateKeyPem: {
+        type: "string",
+        title: "RSA private key (PEM)",
+        description: "Unencrypted RSA private key PEM paired with the API key. Paste here in Admin \u2192 Plugins \u2192 Kalshi, or bootstrap via KALSHI_PRIVATE_KEY_PEM.",
+        format: "pem"
+      }
     }
   };
   service = null;
   initError = null;
   credentials() {
     const cfg = this.getConfig();
-    const environment = str(cfg.environment) === "production" || process.env.KALSHI_ENVIRONMENT === "production" ? "production" : "demo";
+    const envFromConfig = str(cfg.environment);
+    const environment = envFromConfig === "production" || envFromConfig === "demo" ? envFromConfig : process.env.KALSHI_ENVIRONMENT === "production" ? "production" : "demo";
     return {
       apiKey: str(cfg.apiKey) || process.env.KALSHI_API_KEY,
       privateKeyPem: str(cfg.privateKeyPem) || process.env.KALSHI_PRIVATE_KEY_PEM || process.env.KALSHI_PRIVATE_KEY,
       environment,
-      allowTrading: cfg.allowTrading === true || process.env.KALSHI_ALLOW_TRADING === "true"
+      allowTrading: resolveAllowTrading(
+        cfg.allowTrading,
+        process.env.KALSHI_ALLOW_TRADING
+      )
     };
   }
   async ensureService() {
@@ -457,7 +491,7 @@ var KalshiPlugin = class extends import_plugins.BasePlugin {
     const creds = this.credentials();
     if (!creds.apiKey || !creds.privateKeyPem) {
       throw new Error(
-        "Kalshi credentials missing. Set apiKey + privateKeyPem (or KALSHI_API_KEY + KALSHI_PRIVATE_KEY_PEM)."
+        "Kalshi credentials missing. Set API key + RSA private key in Admin \u2192 Plugins \u2192 Kalshi (or bootstrap with KALSHI_API_KEY + KALSHI_PRIVATE_KEY_PEM)."
       );
     }
     const service = new KalshiService({
@@ -470,19 +504,48 @@ var KalshiPlugin = class extends import_plugins.BasePlugin {
     this.initError = null;
     return service;
   }
+  resetService() {
+    this.service = null;
+    this.initError = null;
+  }
   async onInit(agentConfig, config) {
     await super.onInit(agentConfig, config);
     try {
       const creds = this.credentials();
       if (creds.apiKey && creds.privateKeyPem) {
         await this.ensureService();
-        log2.info("Kalshi service ready", { environment: creds.environment });
+        log2.info("Kalshi service ready", {
+          environment: creds.environment,
+          allowTrading: creds.allowTrading
+        });
       } else {
-        log2.info("Kalshi plugin loaded without credentials (tools will error until configured)");
+        log2.info(
+          "Kalshi plugin loaded without credentials (configure in Admin \u2192 Plugins \u2192 Kalshi)"
+        );
       }
     } catch (error) {
       this.initError = error instanceof Error ? error.message : String(error);
       log2.warn("Kalshi init deferred", { error: this.initError });
+    }
+  }
+  async onConfigUpdated(newConfig) {
+    await super.onConfigUpdated(newConfig);
+    this.resetService();
+    try {
+      const creds = this.credentials();
+      if (creds.apiKey && creds.privateKeyPem) {
+        await this.ensureService();
+      }
+      log2.info("Kalshi config updated from admin UI", {
+        environment: creds.environment,
+        allowTrading: creds.allowTrading,
+        hasCredentials: Boolean(creds.apiKey && creds.privateKeyPem)
+      });
+    } catch (error) {
+      this.initError = error instanceof Error ? error.message : String(error);
+      log2.warn("Kalshi re-init after config update failed", {
+        error: this.initError
+      });
     }
   }
   getTools() {
@@ -621,7 +684,7 @@ var KalshiPlugin = class extends import_plugins.BasePlugin {
           const creds = this.credentials();
           if (!creds.allowTrading) {
             throw new Error(
-              "Trading disabled. Set allowTrading=true (or KALSHI_ALLOW_TRADING=true)."
+              "Trading disabled. Turn on \u201CAllow trading\u201D in Admin \u2192 Plugins \u2192 Kalshi (or Business \u2192 Kalshi), then Save."
             );
           }
           const order = {
@@ -646,7 +709,9 @@ var KalshiPlugin = class extends import_plugins.BasePlugin {
         },
         handler: async (params) => {
           if (!this.credentials().allowTrading) {
-            throw new Error("Trading disabled. Set allowTrading=true.");
+            throw new Error(
+              "Trading disabled. Turn on \u201CAllow trading\u201D in Admin \u2192 Plugins \u2192 Kalshi, then Save."
+            );
           }
           const orderId = str(params.orderId);
           if (!orderId) throw new Error("orderId is required");

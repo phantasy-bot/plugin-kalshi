@@ -1,5 +1,6 @@
 import { describe, expect, it } from "vitest";
 
+import { resolveAllowTrading } from "./config-resolve.js";
 import { KalshiService, mapLegacyOrderToV2 } from "./kalshi-service.js";
 
 describe("KalshiService", () => {
@@ -91,5 +92,14 @@ describe("mapLegacyOrderToV2", () => {
         price: 50,
       }),
     ).toThrow(/at least 1/);
+  });
+});
+
+describe("resolveAllowTrading", () => {
+  it("lets plugin UI config override env", () => {
+    expect(resolveAllowTrading(true, "false")).toBe(true);
+    expect(resolveAllowTrading(false, "true")).toBe(false);
+    expect(resolveAllowTrading(undefined, "true")).toBe(true);
+    expect(resolveAllowTrading(undefined, undefined)).toBe(false);
   });
 });

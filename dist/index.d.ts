@@ -17,7 +17,7 @@ declare class KalshiPlugin extends BasePlugin {
         readonly workspace: "business";
         readonly kind: "generic";
         readonly advancedModule: "prediction-markets";
-        readonly keywords: readonly ["kalshi", "prediction markets", "finance"];
+        readonly keywords: readonly ["kalshi", "prediction markets", "finance", "allow trading"];
     };
     protected configSchema: {
         type: string;
@@ -25,21 +25,33 @@ declare class KalshiPlugin extends BasePlugin {
             enabled: {
                 type: string;
                 default: boolean;
+                title: string;
+                description: string;
             };
-            apiKey: {
+            allowTrading: {
                 type: string;
-            };
-            privateKeyPem: {
-                type: string;
+                default: boolean;
+                title: string;
+                description: string;
             };
             environment: {
                 type: string;
                 enum: string[];
                 default: string;
+                title: string;
+                description: string;
             };
-            allowTrading: {
+            apiKey: {
                 type: string;
-                default: boolean;
+                title: string;
+                description: string;
+                format: string;
+            };
+            privateKeyPem: {
+                type: string;
+                title: string;
+                description: string;
+                format: string;
             };
         };
     };
@@ -47,7 +59,9 @@ declare class KalshiPlugin extends BasePlugin {
     private initError;
     private credentials;
     private ensureService;
+    private resetService;
     onInit(agentConfig: Parameters<BasePlugin["onInit"]>[0], config?: Parameters<BasePlugin["onInit"]>[1]): Promise<void>;
+    onConfigUpdated(newConfig: Parameters<BasePlugin["onConfigUpdated"]>[0]): Promise<void>;
     getTools(): PluginTool[];
     handleCustomEndpoint(request: Request, path: string): Promise<Response | null>;
 }
