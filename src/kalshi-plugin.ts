@@ -244,6 +244,48 @@ export class KalshiPlugin extends BasePlugin {
         },
       },
       {
+        name: "kalshi_list_short_crypto",
+        description:
+          "List open Kalshi 15m BTC/ETH (and other *15M) crypto up/down markets. No public 5m series.",
+        parameters: {
+          type: "object",
+          properties: {
+            series: {
+              type: "string",
+              description: "Comma series tickers (default KXBTC15M,KXETH15M)",
+            },
+          },
+        },
+        handler: async (params) => {
+          const service = await this.ensureService();
+          const seriesList = (str(params.series) || "KXBTC15M,KXETH15M")
+            .split(",")
+            .map((s) => s.trim())
+            .filter(Boolean);
+          const markets: unknown[] = [];
+          for (const series_ticker of seriesList) {
+            try {
+              const page = await service.searchMarkets({
+                series_ticker,
+                status: "open",
+                limit: 5,
+              });
+              markets.push(...page);
+            } catch (error) {
+              markets.push({
+                series_ticker,
+                error: error instanceof Error ? error.message : String(error),
+              });
+            }
+          }
+          return {
+            count: markets.length,
+            markets,
+            note: "Kalshi short crypto is 15m (KXBTC15M/KXETH15M). Polymarket also has 5m.",
+          };
+        },
+      },
+      {
         name: "kalshi_search_markets",
         description: "Search Kalshi markets by ticker, series, event, or status.",
         parameters: {
